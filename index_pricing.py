@@ -1,5 +1,5 @@
 import numpy as np
-from src.stock_data_loader import SourceTypes
+from src.data_loading.stock_data_loader import SourceTypes
 
 
 class IndexCalculator(object):
