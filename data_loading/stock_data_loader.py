@@ -2,8 +2,9 @@ import requests
 import re
 import datetime as dt
 import abc
-from yahoo_fin import stock_info as si
 import pandas as pd
+import numpy as np
+from yahoo_fin import stock_info as si
 from enum import Enum
 
 
@@ -35,7 +36,7 @@ class YahooStockDataLoader(StockDataLoader):
         try:
             stock_data = si.get_data(yahoo_ticker, start_date=self._latest_bus_day,
                                      end_date=(self._latest_bus_day + dt.timedelta(days=1)))
-        except ValueError as ex:
+        except ValueError:
             print('Could not find stock data for: {}'.format(yahoo_ticker))
             raise
 
@@ -44,7 +45,7 @@ class YahooStockDataLoader(StockDataLoader):
     def get_market_cap(self, yahoo_ticker):
         stats = si.get_stats(yahoo_ticker)
         market_cap = stats[stats.Attribute.str.contains('Market Cap')].Value[0]
-        return float(re.sub("[A-Z]+", " ", market_cap))
+        return self._convert_str_to_float(market_cap)
 
     def get_ticker(self, company_name, bloomberg_code, exchanges=['TOR'], default='{}.TO'):
         url = self._ticker_search_url.format(company_name)
@@ -59,3 +60,9 @@ class YahooStockDataLoader(StockDataLoader):
             # [print(el) for el in wanted_listing]
             pass
         return wanted_listing[0]['symbol']
+
+    def _convert_str_to_float(self, to_convert):
+        # TODO: find out why market cap would be nan but it's still in the index??
+        if np.isnan(to_convert):
+            return 0
+        return float(re.sub("[A-Z]+", " ", to_convert))

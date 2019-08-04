@@ -5,7 +5,7 @@ class Index(object):
     def __init__(self, bloomberg_code, underlyings, currency, index_level=None, index_divisor=None):
         self.bbg = bloomberg_code  # 'SPTSX'
         self.underlyings = underlyings  # df with all different representations?
-        self.divisor = index_divisor # should this be in this class?
+        self.divisor = index_divisor  # should this be in this class?
         self.level = index_level
         self.currency = currency
 
@@ -29,15 +29,22 @@ class IndexBuilder(object):
         index = Index(index_bloomberg, underlyings, currency)
 
 
-
-
-class IndexConstituentsFinder(abc.ABC):
+class IndexMembersFinder(abc.ABC):
     @abc.abstractmethod
     def find_underlyings(self):
         return []
 
 
-class SPXTSXCompositeConstituentsFinder(IndexConstituentsFinder):
+class IndexMethodologyBuilder(abc.ABC):
+    def __init__(self, member_finder):
+        self._member_finder = member_finder
+
+    @abc.abstractmethod
+    def find_underlyings(self):
+        return []
+
+
+class SPTSXMembersFinder(IndexMembersFinder):
     def __init__(self, bloomberg_code='SPTSX'):
         self.bloomberg_code = bloomberg_code
 
@@ -54,6 +61,13 @@ class SPXTSXCompositeConstituentsFinder(IndexConstituentsFinder):
         pass
 
 
+class IndexMethodologyBuilderFactory(object):
+    _INDEX_TO_MEMBER_FINDER = {'SPTSX': SPTSXMembersFinder}
+
+    def get_index_builder(self, bloomberg_code):
+        member_finder = self._INDEX_TO_MEMBER_FINDER.get(bloomberg_code)
+        if member_finder is None:
+            raise NotImplementedError('No MemberFinder defined for {}'.format(bloomberg_code))
 
 
 

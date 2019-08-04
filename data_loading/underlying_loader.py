@@ -1,12 +1,13 @@
 import re
 import pandas as pd
-from src.data_loading.stock_data_loader import SourceTypes, get_yahoo_ticker
+from src.data_loading.stock_data_loader import SourceTypes
 
 
 class IndexUnderlyingCsvLoader(object):
-    def __init__(self, constituent_csv):
+    def __init__(self, constituent_csv, yahoo_data_loader):
         self._input_file = constituent_csv
         self._data_start_line = 'Constituent Name,Symbol'
+        self._yahoo_data_loader = yahoo_data_loader
         to_remove = ['Limited', 'Inc.', 'Ltd.', 'Corp.', 'Corporation', 'Investment Trust']
         self._remove_from_company_regex = re.compile('|'.join(to_remove))
 
@@ -26,12 +27,15 @@ class IndexUnderlyingCsvLoader(object):
                     preamble_finished = True
         return pd.DataFrame(res_lil, columns=['CompanyName', 'Symbol'])
 
-    def _format_input_data(self, raw_data):
+    def _format_and_fill(self, raw_data):
         raw_data['SearchData'] = raw_data['CompanyName'].apply(self._format_company_name_for_search)
         raw_data['{}Ticker'.format(SourceTypes.YAHOO)] = raw_data.apply(lambda x:
-                                                                        get_yahoo_ticker(x['SearchData'],
+                                                                        self._yahoo_data_loader.get_ticker(x['SearchData'],
                                                                                          x['Symbol']), axis=1)
         return raw_data
+
+    def _format_company_name_for_search(self, company_name):
+        return self._remove_from_company_regex.split(company_name)[0]
 
 
 def main():
