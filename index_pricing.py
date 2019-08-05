@@ -14,13 +14,13 @@ class IndexCalculator(object):
 
     def calculate_index_level(self, index, price_loader):
         constituent_prices = self.calculate_market_cap_and_weights(index, price_loader)
-        total_weighted_market_cap = np.sum(constituent_prices['MarketCap'] * constituent_prices['Weight'])
-        return total_weighted_market_cap/index.divisor
+        total_market_cap = np.sum(constituent_prices['MarketCap'])
+        return total_market_cap/index.divisor
 
     def calculate_index_divisor(self, index, price_loader):
         constituent_prices = self.calculate_market_cap_and_weights(index, price_loader)
-        total_weighted_market_cap = np.sum(constituent_prices['MarketCap'] * constituent_prices['Weight'])
-        return total_weighted_market_cap / index.level
+        total_market_cap = np.sum(constituent_prices['MarketCap'])
+        return total_market_cap / index.level
 
 
 

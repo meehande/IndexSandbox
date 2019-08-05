@@ -1,5 +1,6 @@
 import abc
 import datetime as dt
+import pandas as pd
 from src.index_pricing import IndexCalculator
 from src.utils.calculation_utils import calculate_vwap, get_n_business_dates, subtract_from_date
 from src.data_loading.stock_data_loader import YahooStockDataLoader
@@ -25,8 +26,8 @@ class SPTSXMembersFinder(IndexMembersFinder):
         stocks = self._get_all_possible_stocks()
         stocks = self._min_vwap_filter(stocks)
         stocks = self._min_weight_filter(stocks)
-        #TODO: minweight criteria mentionds 10-day vwap - need to use? to calc??
-        #TODO: liquidity criteria
+        # TODO: minweight criteria mentionds 10-day vwap - need to use? to calc??
+        # TODO: liquidity criteria
         return stocks
 
     def _cap_constituent_weights(self):
@@ -38,12 +39,16 @@ class SPTSXMembersFinder(IndexMembersFinder):
         """
         :return: all stocks listed on TSX that need to be checked for eligibilty
         """
-        # TODO!
-        return []
+        """
+        TODO:
+        - query for all stocks in universe (expect 1500)
+        - calculate 10 day vwap, 3 month vwap, liquidity, qmv... for each stock
+        - return this df to allow next method to filter
+        """
+        return pd.DataFrame()
 
     def _get_ten_day_vwap(self, df):
         last_ten_bus_days = get_n_business_dates(10, end_date=self.computation_date)
-        # TODO: this doesn't work exactly right -> depends on type of tradedate
         mask = df['TradeDate'].isin(last_ten_bus_days)
         df[mask] = calculate_vwap(df[mask])
         return df
@@ -77,3 +82,5 @@ class SPTSXMembersFinder(IndexMembersFinder):
 
     def _min_vwap_filter(self, df):
         return df[df['VWAP'] > self.min_vwap]
+
+

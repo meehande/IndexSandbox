@@ -1,13 +1,14 @@
-from src.data_loading.stock_data_loader import YahooStockDataLoader
+from src.data_loading.stock_data_loader import YahooStockDataLoader, DummyStockDataLoader
 from src.data_loading.underlying_loader import IndexUnderlyingCsvLoader
 from src.index import Index
 from src.index_pricing import IndexCalculator
 
 
 def main():
-    underlyings_csv = r'C:\Users\meeha\PycharmProjects\IndexSandbox\src\data\index_constituents.csv'
+    underlyings_csv = r'data\index_constituents.csv'
     calculator = IndexCalculator()
     price_loader = YahooStockDataLoader()
+    price_loader = DummyStockDataLoader()
     constituents_loader = IndexUnderlyingCsvLoader(underlyings_csv, price_loader)
     constituents = constituents_loader.load_underlyings()
     sptsx = Index('SPTSX', constituents, 'CAD', index_level=16271.66)  # TODO: get this from somehwere else (or divisor)

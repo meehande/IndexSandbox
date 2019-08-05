@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import datetime as dt
 
@@ -19,5 +18,5 @@ def get_n_business_dates(ndays, end_date=dt.date.today()):
     return curr_range
 
 
-def subtract_from_date(date, days=0, months=0, years=0)
+def subtract_from_date(date, days=0, months=0, years=0):
     return dt.date(date.year-years, date.month-months, date.day-days)
