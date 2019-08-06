@@ -1,6 +1,5 @@
 import re
 import pandas as pd
-from src.data_loading.stock_data_loader import SourceTypes
 
 
 class IndexUnderlyingCsvLoader(object):
@@ -29,13 +28,10 @@ class IndexUnderlyingCsvLoader(object):
 
     def _format_and_fill(self, raw_data):
         raw_data['SearchData'] = raw_data['CompanyName'].apply(self._format_company_name_for_search)
-        raw_data['{}Ticker'.format(SourceTypes.YAHOO)] = raw_data.apply(lambda x:
-                                                                        self._data_loader.get_ticker(x['SearchData'],
-                                                                                         x['Symbol']), axis=1)
-        raw_data['{}Ticker'.format(SourceTypes.DUMMY)] = raw_data.apply(lambda x:
-                                                                        self._data_loader.get_ticker(
-                                                                            x['SearchData'],
-                                                                            x['Symbol']), axis=1)
+        raw_data['Ticker'] = raw_data.apply(lambda x: self._data_loader.get_ticker(x['SearchData'],
+                                                                                     x['Symbol']), axis=1)
+        raw_data['ClosingPrice'] = raw_data['Ticker'].apply(self._data_loader.get_latest_closing_price)
+        raw_data['MarketCap'] = raw_data['Ticker'].apply(self._data_loader.get_market_cap)
         return raw_data
 
     def _format_company_name_for_search(self, company_name):

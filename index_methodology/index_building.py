@@ -1,5 +1,5 @@
 import abc
-from src.index_membership_evaluator import SPTSXMembersFinder
+from src.index_methodology.index_membership_evaluator import SPTSXMembersFinder
 
 
 class IndexMethodologyBuilder(abc.ABC):
@@ -18,5 +18,6 @@ class IndexMethodologyBuilderFactory(object):
         member_finder = self._INDEX_TO_MEMBER_FINDER.get(bloomberg_code)
         if member_finder is None:
             raise NotImplementedError('No MemberFinder defined for {}'.format(bloomberg_code))
+        return IndexMethodologyBuilder(member_finder)
 
 
